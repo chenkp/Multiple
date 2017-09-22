@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<!-- 控制浏览器缓存 -->
+<meta http-equiv="Cache-Control" content="no-store" />
+<!-- 优先使用 IE 最新版本和 Chrome -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>快递查询</title>
+
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+	
+	html,
+	body {
+		height: 100%;
+		overflow: hidden;
+	}
+	
+	
+	/*IE/7/6*/
+	
+	.shuru div::-webkit-scrollbar {
+		width: 0;
+		height: 0;
+		-webkit-transition: 1s;
+	}
+	
+	.shuru div::-webkit-scrollbar-thumb {
+		background-color: #a7afb4;
+		background-clip: padding-box;
+		min-height: 28px;
+	}
+	
+	.shuru div::-webkit-scrollbar-thumb:hover {
+		background-color: #525252;
+		background-clip: padding-box;
+		min-height: 28px;
+	}
+	
+	.shuru div::-webkit-scrollbar-track-piece {
+		background-color: #ccd0d2;
+	}
+	
+	.wrap {
+		position: relative;
+		margin: auto;
+		max-width: 640px;
+		min-width: 320px;
+		width: 100%;
+		height: 100%;
+		background: #F0EFF5;
+		overflow: hidden;
+	}
+	
+	
+	/* 输入表单 */
+	
+	.edit_cash {
+		display: block;
+		margin-top: 15px;
+		padding: 15px;
+		margin: 10px auto;
+		width: 90%;
+		border: 1px solid #CFCFCF;
+		border-radius: 10px;
+		background-color: #fff;
+	}
+	
+	.edit_cash p {
+		font-size: 14px;
+		color: #8D8D8F;
+	}
+	
+	.shuru {
+		height:40px;
+		position: relative;
+		margin-bottom: 10px;
+	}
+	
+	.shuru div {
+		border: none;
+		width: 100%;
+		height: 50px;
+		font-size: 25px;
+		line-height: 50px;
+		border-bottom: 1px solid #CFCFCF;
+		text-indent: 30px;
+		outline: none;
+		white-space: pre;
+		overflow-x: scroll;
+	}
+	
+	.shuru span {
+		position: absolute;
+		top: 5px;
+		font-size: 25px;
+	}
+
+	.result_list {
+		display: block;
+		margin-top: 15px;
+		padding: 15px;
+		margin: 10px auto;
+		width: 90%;
+		height: 100%;
+		border: 1px solid #CFCFCF;
+		border-radius: 10px;
+		background-color: #fff;
+		font-family: 防宋;
+		color: black;
+		font-size: 10px;
+		text-align: left;
+	}
+	
+	.submit {
+		display: block;
+		margin: 20px auto 0;
+		width: 90%;
+		height: 40px;
+		font-size: 16px;
+		color: #fff;
+		background: #80D983;
+		border: 1px solid #47D14C;
+		border-radius: 3px;
+	}
+
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div>
+	<form class="edit_cash">
+		<div>
+			<p align="center">
+				<img src="/img/a.jpg" align="center" height="30" width="30"/>
+			</p>
+
+		</div>
+		<!--<b>订单号</b>-->
+		<div class="shuru">
+			<input id="orderId" type="text" placeholder="请输入运单号" size="22" style="font-size:20px;height:100%;width:90%;margin-left:5%" />
+		</div>
+		<!--
+		<div>
+			<select style="height:100%;width:90%;margin-left:5%">
+				<option value ="shunfeng">asd</option>
+				<option value ="shentong">asd</option>
+				<option value ="yuantong">asd</option>
+				<option value ="zhongtong">asd</option>
+				<option value ="yunda">asd</option>
+				<option value ="tiantian">asd</option>
+				<option value ="huitongkuaidi">asd</option>
+				<option value ="quanfengkuaidi">asd</option>
+				<option value ="debangwuliu">asd</option>
+				<option value ="zhaijisong">asd</option>
+			</select>
+		</div>
+		-->
+		<!--<p>输入订单号</p>-->
+	</form>
+	<input id="submit" type="submit" value="查询" class="submit" onclick="findCode();" />
+	</div>
+	<div id="resultContent" style="margin-top: 10px;">
+		<!--<table class="result_list" id="tabId" style="font-family:防宋;color:black;font-size:10px;text-align:left"  cellspacing="15">
+		</table>-->
+	</div>
+</div>
+
+<script src="/js/jquery-1.8.3.min.js"></script>
+<script>
+	function findCode(){
+		var perCode = $.trim($("#orderId").val());
+		if(perCode == null || perCode == ''){
+			return;
+		}
+		var code = {
+			'perCode' : perCode
+		};
+		$.ajax({
+			url:"/kuaidi/query",
+			type:"post",
+			dataType: "json",
+			contentType: "application/json",
+			data: JSON.stringify(code),
+			success:function(data){
+			    var htmlStr = "";
+                htmlStr += "<table >";
+				if(data.status == 200){
+				    var list = data.data;
+//				    var htmlStr = "";
+                    $.each(list, function(i,val){
+                        var times = val['time'];
+                        var contexts = val['context'];
+                        htmlStr += "<tr>";
+                        htmlStr += "<td>" + times + "</td>";
+                        htmlStr += "<td>"+ contexts +"</td>";
+                        htmlStr += "</tr>";
+                    });
+//					$("#tabId").html(htmlStr);
+				}
+				htmlStr += "</table>";
+                $("#resultContent").html(htmlStr);
+                $("table").attr("class","result_list");
+                $("table").attr("cellspacing","15");
+            }
+		});
+	}
+</script>
+
+</body>
+</html>
